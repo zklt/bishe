@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>非接触式掌纹识别系统</string>
   </property>
   <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
@@ -56,7 +56,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>open</string>
+    <string>打开摄像头</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButtoncapture">
@@ -69,7 +69,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>capture</string>
+    <string>拍照</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButtonsave">
@@ -82,7 +82,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>save</string>
+    <string>保存</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButtonexit">
@@ -95,7 +95,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>exit</string>
+    <string>退出摄像头</string>
    </property>
   </widget>
   <widget class="QCommandLinkButton" name="ROI">
@@ -114,46 +114,20 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>ROI提取</string>
-   </property>
-  </widget>
-  <widget class="QCommandLinkButton" name="lbp">
-   <property name="geometry">
-    <rect>
-     <x>510</x>
-     <y>330</y>
-     <width>172</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>特征提取</string>
+    <string>感兴趣区域提取</string>
    </property>
   </widget>
   <widget class="QCommandLinkButton" name="sift">
    <property name="geometry">
     <rect>
      <x>380</x>
-     <y>390</y>
+     <y>380</y>
      <width>172</width>
      <height>41</height>
     </rect>
    </property>
    <property name="text">
     <string>识别</string>
-   </property>
-  </widget>
-  <widget class="QCommandLinkButton" name="database">
-   <property name="geometry">
-    <rect>
-     <x>510</x>
-     <y>390</y>
-     <width>172</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>db</string>
    </property>
   </widget>
  </widget>

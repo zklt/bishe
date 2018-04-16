@@ -1,5 +1,6 @@
 from PyQt5.QtGui import QImage, QPixmap
 import cv2
+import os
 
 def convert(cv_image):
     cv2.imwrite("tmp.jpg", cv_image)

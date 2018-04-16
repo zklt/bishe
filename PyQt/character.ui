@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>非接触式掌纹识别系统</string>
   </property>
   <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
@@ -54,8 +54,8 @@
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>180</x>
-     <y>310</y>
+     <x>240</x>
+     <y>320</y>
      <width>111</width>
      <height>41</height>
     </rect>
@@ -67,8 +67,8 @@
   <widget class="QPushButton" name="ORB">
    <property name="geometry">
     <rect>
-     <x>310</x>
-     <y>370</y>
+     <x>370</x>
+     <y>380</y>
      <width>111</width>
      <height>41</height>
     </rect>
@@ -80,8 +80,8 @@
   <widget class="QPushButton" name="SURF">
    <property name="geometry">
     <rect>
-     <x>310</x>
-     <y>310</y>
+     <x>370</x>
+     <y>320</y>
      <width>111</width>
      <height>41</height>
     </rect>
@@ -93,8 +93,8 @@
   <widget class="QPushButton" name="LDP">
    <property name="geometry">
     <rect>
-     <x>180</x>
-     <y>370</y>
+     <x>240</x>
+     <y>380</y>
      <width>111</width>
      <height>41</height>
     </rect>
@@ -139,7 +139,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>savedb</string>
+    <string>保存到图像库</string>
    </property>
   </widget>
   <widget class="QCommandLinkButton" name="backface">
@@ -152,7 +152,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>back</string>
+    <string>返回</string>
    </property>
   </widget>
  </widget>
