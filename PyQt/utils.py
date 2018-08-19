@@ -1,10 +1,7 @@
 import cv2, imutils as im, argparse
 import numpy as np
 import math
-# import matplotlib.pyplot as plt
-# import matplotlib.image as mpimg
-# import scipy.misc
-
+import time
 
 def process_image(img):
     CORRECTION_NEEDED = False
@@ -104,6 +101,7 @@ def process_image(img):
     final_img = img[int(top):int(bottom),int(left):int(right)]
     # cv2.imshow('palm image', original)
     return final_img
+
 def cacSIFTFeatureAndCompare(srcImage1: np.ndarray, srcImage2: np.ndarray):
     if srcImage1 is None or srcImage2 is None:
         return
@@ -111,7 +109,7 @@ def cacSIFTFeatureAndCompare(srcImage1: np.ndarray, srcImage2: np.ndarray):
     cv2.normalize(grayMat1, grayMat1, 0, 255, cv2.NORM_MINMAX)
     grayMat2 = srcImage2
     cv2.normalize(grayMat2, grayMat2, 0, 255, cv2.NORM_MINMAX)
-    sift = cv2.xfeatures2d.SIFT_create()
+    sift = cv2.xfeatures2d.SIFT_create(contrastThreshold=0.02, sigma=1)
 
     keypoints1, descriptors1 = sift.detectAndCompute(grayMat1, None)
     keypoints2, descriptors2 = sift.detectAndCompute(grayMat2, None)
@@ -123,17 +121,18 @@ def cacSIFTFeatureAndCompare(srcImage1: np.ndarray, srcImage2: np.ndarray):
         matcher = cv2.BFMatcher_create(cv2.NORM_L2)
         viewMatches = []
         matches = matcher.match(d1, d2)
-        minDist = 100
+        minDist = 1000
         for i in matches:
             if i.distance < minDist:
                 minDist = i.distance
         num = 0
         print("minDist:", minDist)
         for i in matches:
-            result += i.distance * i.distance
-            viewMatches.append(i)
-            num += 1
-        if num == 0:
+            if i.distance <= 2 * minDist:
+                result += i.distance * i.distance
+                viewMatches.append(i)
+                num += 1
+        if num < len(matches) * 0.01:
             return 1 << 32
         result = float(result) / float(num)
         return result
@@ -143,6 +142,8 @@ def cacSURFFeatureAndCompare(srcImage1: np.ndarray, srcImage2: np.ndarray, para:
         return
     grayMat1 = srcImage1
     grayMat2 = srcImage2
+    # cv2.imshow("" ,grayMat1)
+    # cv2.waitKey()
     surf = cv2.xfeatures2d_SURF.create(para)
     k1, d1 = surf.detectAndCompute(grayMat1, None)
     k2, d2 = surf.detectAndCompute(grayMat2, None)
@@ -162,7 +163,7 @@ def cacSURFFeatureAndCompare(srcImage1: np.ndarray, srcImage2: np.ndarray, para:
                 result += i.distance * i.distance
                 viewMatches.append(i)
                 num += 1
-        if num == 0:
+        if num < len(matches) * 0.01:
             return 1 << 32
         result = float(result) / float(num)
         return result
@@ -173,31 +174,36 @@ def cacORBFeatureSAndCompare(srcImage1: np.ndarray, srcImage2: np.ndarray):
         return
     orb = cv2.ORB_create()
     if not isinstance(orb, cv2.ORB): return
-    keyPoint1 = orb.detect(srcImage1)
-    keyPoint2 = orb.detect(srcImage2)
-    keyPoint1, descriptorMat1 = orb.compute(srcImage1, keyPoint1)
-    keyPoint2, descriptorMat2 = orb.compute(srcImage2, keyPoint2)
+    orb.setFastThreshold(3)
+    orb.setScaleFactor(1.3)
+    orb.setNLevels(16)
+    orb.setEdgeThreshold(3)
+    keyPoint1, descriptorMat1 = orb.detectAndCompute(srcImage1, None)
+    keyPoint2, descriptorMat2 = orb.detectAndCompute(srcImage2, None)
     result = 0
     k1, k2 = keyPoint1, keyPoint2
     d1, d2 = descriptorMat1, descriptorMat2
     if len(k1) > 0 and len(k2) > 0:
-        matcher = cv2.BFMatcher_create(cv2.NORM_HAMMING)
+        matcher = cv2.BFMatcher_create(cv2.NORM_HAMMING, crossCheck=True)
         viewMatches = []
         matches = matcher.match(d1, d2)
-        minDist = 100
+        minDist = 200
         for i in matches:
             if i.distance < minDist:
                 minDist = i.distance
         num = 0
         print("minDist:", minDist)
         for i in matches:
-            if i.distance <= 2 * minDist:
-                result += i.distance * i.distance
-                viewMatches.append(i)
-                num += 1
-        if num == 0:
-            return 1 << 32
+            result += i.distance
+            viewMatches.append(i)
+            num += 1
+        # if num < len(matches) * 0.01:
+        #     print("inf")
+        #     return 1 << 32
         result = float(result) / float(num)
+        print(result)
+        end = time.time()
+
         return result
 
 def heqConvert(srcImage: np.ndarray):
@@ -211,8 +217,7 @@ def heqConvert(srcImage: np.ndarray):
     return colorHeqImage
 
 def hand2(srcImage: np.ndarray):
-        mq = heqConvert(srcImage)
-        src_YCrCb = cv2.cvtColor(mq, cv2.COLOR_BGR2YCrCb)
+        src_YCrCb = cv2.cvtColor(srcImage, cv2.COLOR_BGR2YCrCb)
         channels = cv2.split(src_YCrCb)
         gray = channels[1]
         retval, binaryImage = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU)
@@ -253,15 +258,19 @@ def hand2(srcImage: np.ndarray):
                     x = j
                     y = i
                     maxdist = dist
+
         # 得到手掌中心并画出最大内切圆
         final_img = img.copy()
-        cv2.circle(img, (x, y), maxdist, (255, 100, 255), 1, 8, 0)
+        cv2.circle(img, (x+22, y-20), maxdist, (255, 100, 255), 1, 8, 0)
         half_slide = maxdist * math.cos(math.pi / 4)
-        (left, right, top, bottom) = ((x - half_slide), (x + half_slide), (y - half_slide), (y + half_slide))
+        (left, right, top, bottom) = ((x+22 - half_slide), (x+22 + half_slide), (y-20 - half_slide), (y-20 + half_slide))
         p1 = (int(left), int(top))
         p2 = (int(right), int(bottom))
         cv2.rectangle(img, p1, p2, (77, 255, 9), 1, 1)
         final_img = img[int(top):int(bottom), int(left):int(right)]
-        # cv2.imshow('palm image', original)
-        final_img = cv2.cvtColor(final_img, cv2.COLOR_BGRA2GRAY)
+        # final_img = cv2.cvtColor(final_img, cv2.COLOR_BGRA2GRAY)
         return final_img
+
+if __name__ == '__main__':
+    i = cv2.imread("./Images/1.jpg", 0)
+    cacSURFFeatureAndCompare(i,i,1000)
